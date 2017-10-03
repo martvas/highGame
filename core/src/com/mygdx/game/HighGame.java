@@ -89,7 +89,7 @@ public class HighGame extends ApplicationAdapter {
 
         for (int i = 0; i < bulletEmitter.activeList.size(); i++) {
             Bullet b = bulletEmitter.activeList.get(i);
-            if (b.isPlayerBullet()){
+            if (b.isPlayerBullet()) {
                 //Коллизии пули - Нло
                 for (int j = 0; j < enemyUfoEmitter.activeList.size(); j++) {
                     EnemyUfo ufo = enemyUfoEmitter.activeList.get(j);
@@ -97,31 +97,34 @@ public class HighGame extends ApplicationAdapter {
                         b.deactivate();
                         ufo.takeDamage(1);
                     }
-
-                    //Колизии пули - ракеты
-                    for (int k = 0; k < rocketEmitter.getActiveList().size(); k++) {
-                        Rocket r = rocketEmitter.getActiveList().get(k);
-                        if (r.getHitArea().contains(b.getPosition())) {
-                            b.deactivate();
-                            r.takeDamage(1);
-                        }
-                    }
-
-                    //Колизии пули - астероиды
-                    for (int l = 0; l < asteroidEmitter.getActiveList().size(); l++) {
-                        Asteroid a = asteroidEmitter.getActiveList().get(l);
-                        if (a.getHitArea().contains(b.getPosition())) {
-                            if (a.takeDamage(1)) {
-                                a.deactivate();
-                                player.addScore(10);
-                            }
-                            b.deactivate();
-                        }
+                }
+                //Колизии пули - ракеты
+                for (int k = 0; k < rocketEmitter.getActiveList().size(); k++) {
+                    Rocket r = rocketEmitter.getActiveList().get(k);
+                    if (r.getHitArea().contains(b.getPosition())) {
+                        b.deactivate();
+                        r.takeDamage(1);
                     }
                 }
-            }
-            else {
 
+                //Колизии пули - астероиды
+                for (int l = 0; l < asteroidEmitter.getActiveList().size(); l++) {
+                    Asteroid a = asteroidEmitter.getActiveList().get(l);
+                    if (a.getHitArea().contains(b.getPosition())) {
+                        if (a.takeDamage(1)) {
+                            a.deactivate();
+                            player.addScore(10);
+                        }
+                        b.deactivate();
+                    }
+                }
+
+            } else {
+                //Колизии пули Врага - корабль
+                if (player.getHitArea().contains(b.getPosition())) {
+                    b.deactivate();
+                    player.takeDamage(2);
+                }
             }
         }
 
@@ -146,15 +149,6 @@ public class HighGame extends ApplicationAdapter {
                     asteroid.getPosition().mulAdd(collisionHelper, interlen);
                     asteroid.getPosition().mulAdd(collisionHelper, interlen);
                 }
-            }
-        }
-
-        //Колизии пули Врага - корабль
-        for (int i = 0; i < bulletEmitter.getActiveList().size(); i++) {
-            Bullet b = bulletEmitter.getActiveList().get(i);
-            if (player.getHitArea().contains(b.getPosition())) {
-                b.deactivate();
-                player.takeDamage(2);
             }
         }
 
