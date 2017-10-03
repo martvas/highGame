@@ -1,34 +1,27 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
-public class EnemyUfo implements PoolableMy {
+public class EnemyUfo extends Ship implements PoolableMy {
     private static final float SIZE = 64.0f;
     private static final float HALF_SIZE = SIZE / 2;
 
-    private Vector2 position;
-    private Vector2 velocity;
     private int level;
-    private int hp;
-    private int maxHp;
-    private float reddish;
     private float scale;
     private boolean active;
-    private Circle hitArea;
+    AtlasRegion enemyUfoTexture;
 
     float innerTimerToMove;
     float randomEnemyMoveTime;
     int randomMove;
 
-    HighGame game;
-    float fireTimer;
-    private float fireRate;
-
-    public EnemyUfo(){
+    public EnemyUfo(AtlasRegion enemyUfoTexture){
+        this.enemyUfoTexture = enemyUfoTexture;
+        System.out.println(enemyUfoTexture);
         position = new Vector2(0.0f, 0.0f);
         velocity = new Vector2(0.0f, 0.0f);
         hp = 0;
@@ -36,15 +29,14 @@ public class EnemyUfo implements PoolableMy {
         reddish = 0.0f;
         hitArea = new Circle();
         level = 0;
+        this.weaponDirection = new Vector2(-1.0f, 0.0f);
 
         innerTimerToMove = 0;
         randomMove = 0;
 
-        fireTimer = 0;
-        fireRate = 0;
+        isPlayer = false;
         active = false;
     }
-
 
     public Circle getHitArea() {
         return hitArea;
@@ -56,11 +48,12 @@ public class EnemyUfo implements PoolableMy {
         return active;
     }
 
-    public void render(SpriteBatch batch, TextureAtlas.AtlasRegion enemyTexture){
+    @Override
+    public void render(SpriteBatch batch){
         if (reddish > 0.01){
             batch.setColor(1.0f, 1.0f- reddish, 1.0f - reddish, 1.0f);
         }
-        batch.draw(enemyTexture, position.x - HALF_SIZE, position.y - HALF_SIZE, HALF_SIZE, HALF_SIZE, SIZE,
+        batch.draw(enemyUfoTexture, position.x - HALF_SIZE, position.y - HALF_SIZE, HALF_SIZE, HALF_SIZE, SIZE,
                 SIZE, scale, scale, 0);
 
         if (reddish > 0.1){
@@ -71,7 +64,7 @@ public class EnemyUfo implements PoolableMy {
     public void update(float dt) {
 
         movements(dt);
-        fireTimer(dt);
+        pressFire(dt);
 
         position.mulAdd(velocity, dt);
         hitArea.setPosition(position);
@@ -92,12 +85,18 @@ public class EnemyUfo implements PoolableMy {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        deactivate();
+    }
+
     public void deactivate(){
         active = false;
     }
 
 
-    public void activate(float x, float y, int level, HighGame game){
+    public void activate(float x, float y, int level, AtlasRegion enemyUfoTexture){
+        this.enemyUfoTexture = enemyUfoTexture;
         position.set(x, y);
         this.level = level;
         maxHp = 3 * level;
@@ -107,22 +106,9 @@ public class EnemyUfo implements PoolableMy {
         hitArea = new Circle(position.x, position.y, 28 * scale);
 
         randomEnemyMoveTime = MathUtils.random(0.01f, 0.5f);
-
-        this.game = game;
         fireRate = 2f + (0.2f * level) + randomEnemyMoveTime;
 
         active = true;
-    }
-
-    public boolean takeDamage(int damage){
-        maxHp -= damage;
-        reddish += 0.2;
-        if (reddish >= 1.0f) reddish = 1.0f;
-        if (maxHp <= 0) {
-            deactivate();
-            return true;
-        }
-        return false;
     }
 
     //Мои враги это НЛО поэтому они так передвигаются.
@@ -160,17 +146,5 @@ public class EnemyUfo implements PoolableMy {
         }
     }
 
-    //Стреляют они также с рандомный коэфициэнтом
-    public void fireTimer(float dt){
-        fireTimer += dt;
-        if (fireTimer > fireRate){
-            fire();
-            fireTimer = 0;
-        }
-    }
-
-    public void fire(){
-        game.getBulletEmitterEnemy().setup(position.x -32, position.y, -300, 0);
-    }
 
 }

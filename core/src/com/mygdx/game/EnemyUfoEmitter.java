@@ -10,22 +10,22 @@ import static com.mygdx.game.HighGame.SCREEN_WIDTH;
 public class EnemyUfoEmitter extends ObjectPool<EnemyUfo> {
     private float innerTimer;
     private float generationTime;
-    private HighGame game;
+    AtlasRegion enemyUfoTexture;
 
-    public EnemyUfoEmitter(int size, HighGame game, float generationTime){
+    public EnemyUfoEmitter(int size, float generationTime, AtlasRegion enemyUfoTexture){
         super(size);
-        this.game = game;
         this.generationTime = generationTime;
+        this.enemyUfoTexture = enemyUfoTexture;
     }
 
     @Override
     protected EnemyUfo newObject() {
-        return new EnemyUfo();
+        return new EnemyUfo(enemyUfoTexture);
     }
 
-    public void render(SpriteBatch batch, AtlasRegion enemyTexture){
+    public void render(SpriteBatch batch){
         for (int i = 0; i < activeList.size(); i++) {
-            activeList.get(i).render(batch, enemyTexture);
+            activeList.get(i).render(batch);
         }
     }
 
@@ -45,6 +45,6 @@ public class EnemyUfoEmitter extends ObjectPool<EnemyUfo> {
         float x = (float) Math.random() * SCREEN_WIDTH + SCREEN_WIDTH;
         float y = (float) Math.random() * SCREEN_HEIGHT;
         int randomLevel = MathUtils.random(1, 4);
-        enemyUfo.activate(x, y, randomLevel, game);
+        enemyUfo.activate(x, y, randomLevel, enemyUfoTexture);
     }
 }

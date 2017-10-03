@@ -15,11 +15,10 @@ public class HighGame extends ApplicationAdapter {
 
     private SpriteBatch batch;
     private TextureAtlas atlas;
-    private Ship ship;
+    private Player player;
     private float dt;
     private Background background;
     private BulletEmitter bulletEmitter;
-    private BulletEmitter bulletEmitterEnemy;
     private AsteroidEmitter asteroidEmitter;
     private RocketEmitter rocketEmitter;
     private EnemyUfoEmitter enemyUfoEmitter;
@@ -29,13 +28,12 @@ public class HighGame extends ApplicationAdapter {
     public void create() {
         batch = new SpriteBatch();
         atlas = new TextureAtlas(Gdx.files.internal("highGameAtlas.atlas"));
-        ship = new Ship(this, atlas, atlas.findRegion("hpBar"), 74, 328, 0, 0, 10);
+        player = new Player(this, atlas, atlas.findRegion("hpBar"), 74, 328, 0, 0, 10);
         background = new Background(atlas);
-        asteroidEmitter = new AsteroidEmitter(25, 0.5f);
+        asteroidEmitter = new AsteroidEmitter(25, 0.5f, atlas.findRegion("asteroid"));
         rocketEmitter = new RocketEmitter(3, 5.0f);
-        enemyUfoEmitter = new EnemyUfoEmitter(1, this, 7.0f);
-        bulletEmitter = new BulletEmitter(atlas.findRegion("bullet"), 200);
-        bulletEmitterEnemy = new BulletEmitter(atlas.findRegion("bulletOther"), 100);
+        enemyUfoEmitter = new EnemyUfoEmitter(5, 7.0f, atlas.findRegion("ufo"));
+        bulletEmitter = new BulletEmitter(atlas, 200);
         font = new BitmapFont(Gdx.files.internal("font.fnt"));
     }
 
@@ -43,8 +41,8 @@ public class HighGame extends ApplicationAdapter {
         return bulletEmitter;
     }
 
-    public BulletEmitter getBulletEmitterEnemy() {
-        return bulletEmitterEnemy;
+    public TextureAtlas getAtlas() {
+        return atlas;
     }
 
     @Override
@@ -55,28 +53,25 @@ public class HighGame extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
         background.render(batch);
-        ship.render(batch);
+        player.render(batch);
         rocketEmitter.render(batch, atlas.findRegion("enemyRocket"));
         bulletEmitter.render(batch);
-        bulletEmitterEnemy.render(batch);
-        asteroidEmitter.render(batch, atlas.findRegion("asteroid"));
-        enemyUfoEmitter.render(batch, atlas.findRegion("ufo"));
-        ship.renderHUD(batch, 20, 668, font);
+        asteroidEmitter.render(batch);
+        enemyUfoEmitter.render(batch);
+        player.renderHUD(batch, 20, 668, font);
         batch.end();
     }
 
     public void update(float dt) {
-        background.update(dt, ship.getVelocity());
-        ship.update(dt);
+        background.update(dt, player.getVelocity());
+        player.update(dt);
         bulletEmitter.update(dt);
-        bulletEmitterEnemy.update(dt);
         asteroidEmitter.update(dt);
         rocketEmitter.update(dt);
         enemyUfoEmitter.update(dt);
         checkCollision();
         rocketEmitter.checkNoActiveElement();
         bulletEmitter.checkNoActiveElement();
-        bulletEmitterEnemy.checkNoActiveElement();
         asteroidEmitter.checkNoActiveElement();
         enemyUfoEmitter.checkNoActiveElement();
     }
@@ -106,9 +101,9 @@ public class HighGame extends ApplicationAdapter {
         //Колизии ракеты - корабль
         for (int i = 0; i < rocketEmitter.activeList.size(); i++) {
             Rocket rocket = rocketEmitter.activeList.get(i);
-            if (ship.getHitArea().overlaps(rocket.getHitArea())) {
+            if (player.getHitArea().overlaps(rocket.getHitArea())) {
                 rocket.deactivate();
-                ship.takeDamage(5 * rocket.getLevel());
+                player.takeDamage(5 * rocket.getLevel());
             }
         }
 
@@ -128,11 +123,11 @@ public class HighGame extends ApplicationAdapter {
         }
 
         //Колизии пули Врага - корабль
-        for (int i = 0; i < bulletEmitterEnemy.getActiveList().size(); i++) {
-            Bullet b = bulletEmitterEnemy.getActiveList().get(i);
-            if (ship.getHitArea().contains(b.getPosition())) {
+        for (int i = 0; i < bulletEmitter.getActiveList().size(); i++) {
+            Bullet b = bulletEmitter.getActiveList().get(i);
+            if (player.getHitArea().contains(b.getPosition())) {
                 b.deactivate();
-                ship.takeDamage(2);
+                player.takeDamage(2);
             }
         }
 
@@ -156,7 +151,7 @@ public class HighGame extends ApplicationAdapter {
                 if (a.getHitArea().contains(b.getPosition())) {
                     if (a.takeDamage(1)) {
                         a.deactivate();
-                        ship.addScore(10);
+                        player.addScore(10);
                     }
                     b.deactivate();
                 }
@@ -166,16 +161,16 @@ public class HighGame extends ApplicationAdapter {
         //Колизии астероиды - корабль
         for (int j = 0; j < asteroidEmitter.getActiveList().size(); j++) {
             Asteroid a = asteroidEmitter.getActiveList().get(j);
-            if (ship.getHitArea().overlaps(a.getHitArea())) {
-                float len = ship.getPosition().dst(a.getPosition());
-                float interLen = (ship.getHitArea().radius + a.getHitArea().radius) - len;
-                collisionHelper.set(a.getPosition()).sub(ship.getPosition()).nor();
+            if (player.getHitArea().overlaps(a.getHitArea())) {
+                float len = player.getPosition().dst(a.getPosition());
+                float interLen = (player.getHitArea().radius + a.getHitArea().radius) - len;
+                collisionHelper.set(a.getPosition()).sub(player.getPosition()).nor();
                 a.getPosition().mulAdd(collisionHelper, interLen);
-                ship.getPosition().mulAdd(collisionHelper, -interLen);
+                player.getPosition().mulAdd(collisionHelper, -interLen);
                 a.getVelocity().mulAdd(collisionHelper, interLen * 4);
-                ship.getVelocity().mulAdd(collisionHelper, -interLen * 4);
+                player.getVelocity().mulAdd(collisionHelper, -interLen * 4);
                 a.takeDamage(1);
-                ship.takeDamage(1);
+                player.takeDamage(1);
             }
 
         }

@@ -1,39 +1,28 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
-public class Asteroid implements PoolableMy {
+public class Asteroid extends SpaceObject implements PoolableMy {
     public static final float MIN_SPEED = 120.0f;
     public static final float MAX_SPEED = 360.0f;
     private static final float SIZE = 64.0f;
     private static final float HALF_SIZE = SIZE / 2;
-    private Vector2 position;
-    private Vector2 velocity;
+
     private float scale;
     private float angle;
     private float angularSpeed;
-    private int hp;
-    private int maxHp;
-    private Circle hitArea;
-    float reddish;
+    AtlasRegion asteroidTexture;
 
-    private boolean active;
 
-    public Vector2 getPosition() {
-        return position;
-    }
-
-    public Vector2 getVelocity() {
-        return velocity;
-    }
-
-    public Asteroid() {
+    public Asteroid(AtlasRegion asteroidTexture) {
         this.position = new Vector2(0.0f, 0.0f);
         this.velocity = new Vector2(0.0f, 0.0f);
+        this.asteroidTexture = asteroidTexture;
         this.scale = 0.0f;
         this.angle = 0.0f;
         this.angularSpeed = 0.0f;
@@ -44,17 +33,28 @@ public class Asteroid implements PoolableMy {
         this.active = false;
     }
 
-    public Circle getHitArea() {
-        return hitArea;
+    @Override
+    public void render(SpriteBatch batch) {
+        if (reddish > 0.01f) {
+            batch.setColor(1.0f, 1.0f - reddish, 1.0f - reddish, 1.0f);
+        }
+        batch.draw(asteroidTexture, position.x - HALF_SIZE, position.y - HALF_SIZE, HALF_SIZE, HALF_SIZE, SIZE, SIZE,
+                scale, scale, angle, false);
+        if (reddish > 0.01f) {
+            batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+        }
     }
 
     @Override
-    public boolean isActive() {
-        return active;
-    }
-
-    public void deactivate() {
-        this.active = false;
+    public void update(float dt) {
+        position.mulAdd(velocity, dt);
+        angle += angularSpeed * dt;
+        if (position.x < -100.0f) {
+            deactivate();
+        }
+        hitArea.setPosition(position);
+        reddish -= dt * 2.0f;
+        if (reddish < 0.0f) reddish = 0.0f;
     }
 
     public void activate(float x, float y, float vx, float vy, int maxHp) {
@@ -70,38 +70,10 @@ public class Asteroid implements PoolableMy {
         active = true;
     }
 
-    public void render(SpriteBatch batch, TextureRegion asteroidTexture){
-        if (reddish > 0.01f) {
-            batch.setColor(1.0f, 1.0f - reddish, 1.0f - reddish, 1.0f);
-        }
-        batch.draw(asteroidTexture, position.x - HALF_SIZE, position.y - HALF_SIZE, HALF_SIZE, HALF_SIZE, SIZE, SIZE,
-                scale, scale, angle, false);
-        if (reddish > 0.01f) {
-            batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
-        }
+    @Override
+    public void onDestroy() {
+        deactivate();
     }
-
-    public void update(float dt) {
-        position.mulAdd(velocity, dt);
-        angle += angularSpeed * dt;
-        if (position.x < -100.0f) {
-            deactivate();
-        }
-        hitArea.setPosition(position);
-        reddish -= dt * 2.0f;
-        if (reddish < 0.0f) reddish = 0.0f;
-    }
-
-    public boolean takeDamage(int dmg) {
-        hp -= dmg;
-        reddish += 0.2f;
-        if (hp <= 0) {
-            deactivate();
-        }
-        if (reddish > 1.0f) reddish = 1.0f;
-        return hp <= 0;
-    }
-
 
 }
 

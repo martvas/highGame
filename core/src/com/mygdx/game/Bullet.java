@@ -1,11 +1,14 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 
 public class Bullet implements PoolableMy {
     private Vector2 position;
     private Vector2 velocity;
     private boolean active;
+    private boolean isPlayerBullet;
+    private TextureAtlas.AtlasRegion bulletTexture;
 
     public Vector2 getPosition() {
         return position;
@@ -13,6 +16,10 @@ public class Bullet implements PoolableMy {
 
     public Vector2 getVelocity() {
         return velocity;
+    }
+
+    public TextureAtlas.AtlasRegion getBulletTexture() {
+        return bulletTexture;
     }
 
     public void deactivate(){
@@ -30,9 +37,13 @@ public class Bullet implements PoolableMy {
         return active;
     }
 
-    public void activate(float x, float y, float vx, float vy){
+    public void activate(boolean isPlayerBullet, TextureAtlas atlas, float x, float y, float vx, float vy){
         position.set(x, y);
         velocity.set(vx, vy);
+        this.isPlayerBullet = isPlayerBullet;
+        if (isPlayerBullet) {
+            bulletTexture = atlas.findRegion("bullet");
+        } else bulletTexture = atlas.findRegion("bulletOther");
         active = true;
     }
 

@@ -1,13 +1,14 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 
 public class BulletEmitter extends ObjectPool<Bullet> {
-    AtlasRegion bulletTexture;
-    public BulletEmitter(AtlasRegion bulletTexture, int size){
+    TextureAtlas atlas;
+    public BulletEmitter(TextureAtlas atlas, int size){
         super(size);
-        this.bulletTexture = bulletTexture;
+        this.atlas = atlas;
     }
 
     @Override
@@ -17,7 +18,7 @@ public class BulletEmitter extends ObjectPool<Bullet> {
 
     public void render(SpriteBatch batch){
         for (int i = 0; i < activeList.size(); i++) {
-            batch.draw(bulletTexture, activeList.get(i).getPosition().x - 8, activeList.get(i).getPosition().y - 8);
+            batch.draw(activeList.get(i).getBulletTexture(),activeList.get(i).getPosition().x - 8, activeList.get(i).getPosition().y - 8);
         }
     }
 
@@ -27,9 +28,9 @@ public class BulletEmitter extends ObjectPool<Bullet> {
         }
     }
 
-    public void setup(float x, float y, float vx, float vy){
+    public void setup(boolean isPlayerBullet, float x, float y, float vx, float vy){
         Bullet b = getActiveElement();
-        b.activate(x, y, vx, vy);
+        b.activate(isPlayerBullet, atlas, x, y, vx, vy);
     }
 
 }
