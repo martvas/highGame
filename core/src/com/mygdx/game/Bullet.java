@@ -22,6 +22,10 @@ public class Bullet implements PoolableMy {
         return bulletTexture;
     }
 
+    public boolean isPlayerBullet() {
+        return isPlayerBullet;
+    }
+
     public void deactivate(){
         this.active = false;
     }

@@ -17,6 +17,7 @@ public abstract class Ship extends SpaceObject {
     public void pressFire(float dt) {
         currentFire += dt;
         if (currentFire > fireRate) {
+            System.out.println(isPlayer + "ataka");
             currentFire -= fireRate;
             fire();
         }

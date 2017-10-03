@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 public class EnemyUfo extends Ship implements PoolableMy {
+
     private static final float SIZE = 64.0f;
     private static final float HALF_SIZE = SIZE / 2;
 
@@ -19,9 +20,7 @@ public class EnemyUfo extends Ship implements PoolableMy {
     float randomEnemyMoveTime;
     int randomMove;
 
-    public EnemyUfo(AtlasRegion enemyUfoTexture){
-        this.enemyUfoTexture = enemyUfoTexture;
-        System.out.println(enemyUfoTexture);
+    public EnemyUfo() {
         position = new Vector2(0.0f, 0.0f);
         velocity = new Vector2(0.0f, 0.0f);
         hp = 0;
@@ -38,25 +37,20 @@ public class EnemyUfo extends Ship implements PoolableMy {
         active = false;
     }
 
-    public Circle getHitArea() {
-        return hitArea;
-    }
-
-
     @Override
     public boolean isActive() {
         return active;
     }
 
     @Override
-    public void render(SpriteBatch batch){
-        if (reddish > 0.01){
-            batch.setColor(1.0f, 1.0f- reddish, 1.0f - reddish, 1.0f);
+    public void render(SpriteBatch batch) {
+        if (reddish > 0.01) {
+            batch.setColor(1.0f, 1.0f - reddish, 1.0f - reddish, 1.0f);
         }
         batch.draw(enemyUfoTexture, position.x - HALF_SIZE, position.y - HALF_SIZE, HALF_SIZE, HALF_SIZE, SIZE,
                 SIZE, scale, scale, 0);
 
-        if (reddish > 0.1){
+        if (reddish > 0.1) {
             batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
         }
     }
@@ -72,14 +66,14 @@ public class EnemyUfo extends Ship implements PoolableMy {
         reddish -= 2 * dt;
         if (reddish <= 0) reddish = 0;
 
-        if (position.x < -100){
+        if (position.x < -100) {
             deactivate();
         }
-        if (position.y > HighGame.SCREEN_HEIGHT - HALF_SIZE){
+        if (position.y > HighGame.SCREEN_HEIGHT - HALF_SIZE) {
             position.y = HighGame.SCREEN_HEIGHT - HALF_SIZE;
-            if (velocity.y > 0.0f ) velocity.y *= -1;
+            if (velocity.y > 0.0f) velocity.y *= -1;
         }
-        if (position.y < HALF_SIZE){
+        if (position.y < HALF_SIZE) {
             position.y = HALF_SIZE;
             if (velocity.y < 0.0f) velocity.y *= -1;
         }
@@ -90,13 +84,13 @@ public class EnemyUfo extends Ship implements PoolableMy {
         deactivate();
     }
 
-    public void deactivate(){
+    public void deactivate() {
         active = false;
     }
 
 
-    public void activate(float x, float y, int level, AtlasRegion enemyUfoTexture){
-        this.enemyUfoTexture = enemyUfoTexture;
+    public void activate(float x, float y, int level, HighGame game) {
+        this.enemyUfoTexture = game.getAtlas().findRegion("ufo");
         position.set(x, y);
         this.level = level;
         maxHp = 3 * level;
@@ -107,26 +101,28 @@ public class EnemyUfo extends Ship implements PoolableMy {
 
         randomEnemyMoveTime = MathUtils.random(0.01f, 0.5f);
         fireRate = 2f + (0.2f * level) + randomEnemyMoveTime;
-
+        this.game = game;
         active = true;
     }
 
     //Мои враги это НЛО поэтому они так передвигаются.
     //Навстречу моему кораблю двигаются на большее растояние, но могут и отступить на расстояние покороче
-    public void movements(float dt){
+    public void movements(float dt) {
         innerTimerToMove += dt;
-        if (randomMove == 0){
-            randomMove = MathUtils.random(1 , 4);
+        if (randomMove == 0) {
+            randomMove = MathUtils.random(1, 4);
         }
-        switch (randomMove){
+        switch (randomMove) {
             case (1):
                 velocity.x = -MathUtils.random(200.0f, 300.0f);
                 velocity.y = MathUtils.random(-200.0f, 0.0f);
                 randomMove = 5;
                 break;
             case (2):
-                velocity.x = -MathUtils.random(200.0f, 300.0f);;
-                velocity.y = MathUtils.random(0.0f, 200.0f);;
+                velocity.x = -MathUtils.random(200.0f, 300.0f);
+                ;
+                velocity.y = MathUtils.random(0.0f, 200.0f);
+                ;
                 randomMove = 5;
                 break;
             case (3):
@@ -135,7 +131,7 @@ public class EnemyUfo extends Ship implements PoolableMy {
                 break;
             case (4):
                 velocity.x = MathUtils.random(50.0f, 75.0f);
-                velocity.y = MathUtils.random( -50.0f, 0.0f);
+                velocity.y = MathUtils.random(-50.0f, 0.0f);
                 randomMove = 5;
                 break;
         }
