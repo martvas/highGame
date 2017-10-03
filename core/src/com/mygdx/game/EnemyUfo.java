@@ -13,7 +13,6 @@ public class EnemyUfo extends Ship implements PoolableMy {
 
     private int level;
     private float scale;
-    private boolean active;
     AtlasRegion enemyUfoTexture;
 
     float innerTimerToMove;
@@ -84,11 +83,6 @@ public class EnemyUfo extends Ship implements PoolableMy {
         deactivate();
     }
 
-    public void deactivate() {
-        active = false;
-    }
-
-
     public void activate(float x, float y, int level, HighGame game) {
         this.enemyUfoTexture = game.getAtlas().findRegion("ufo");
         position.set(x, y);
@@ -120,9 +114,7 @@ public class EnemyUfo extends Ship implements PoolableMy {
                 break;
             case (2):
                 velocity.x = -MathUtils.random(200.0f, 300.0f);
-                ;
                 velocity.y = MathUtils.random(0.0f, 200.0f);
-                ;
                 randomMove = 5;
                 break;
             case (3):

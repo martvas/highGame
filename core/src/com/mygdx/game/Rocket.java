@@ -5,21 +5,13 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 
-public class Rocket implements PoolableMy {
+public class Rocket extends Ship implements PoolableMy {
     private static final float SIZE = 64.0f;
     private static final float HALF_SIZE = SIZE / 2;
 
-    private Vector2 position;
-    private Vector2 velocity;
-
     private int level;
-    private int hp;
-    private int maxHp;
-    private float reddish;
     private float scale;
-    private boolean active;
-    private Circle hitArea;
-
+    private AtlasRegion rocketTexture;
 
     public Rocket(){
         position = new Vector2(0.0f, 0.0f);
@@ -32,28 +24,16 @@ public class Rocket implements PoolableMy {
         level = 0;
     }
 
-    public Circle getHitArea() {
-        return hitArea;
-    }
-
-    public Vector2 getPosition() {
-        return position;
-    }
-
     public int getLevel() {
         return level;
     }
 
     @Override
-    public boolean isActive() {
-        return active;
-    }
-
-    public void render(SpriteBatch batch, AtlasRegion enemyTexture){
+    public void render(SpriteBatch batch){
         if (reddish > 0.01){
             batch.setColor(1.0f, 1.0f- reddish, 1.0f - reddish, 1.0f);
         }
-        batch.draw(enemyTexture, position.x - HALF_SIZE, position.y - HALF_SIZE, HALF_SIZE, HALF_SIZE, SIZE,
+        batch.draw(rocketTexture, position.x - HALF_SIZE, position.y - HALF_SIZE, HALF_SIZE, HALF_SIZE, SIZE,
                 SIZE, scale, scale, 0);
 
         if (reddish > 0.1){
@@ -81,13 +61,14 @@ public class Rocket implements PoolableMy {
         }
     }
 
-    public void deactivate(){
+    @Override
+    public void onDestroy() {
         active = false;
     }
 
-
-    public void activate(float x, float y, int level){
+    public void activate(float x, float y, int level, AtlasRegion rocketTexture){
         position.set(x, y);
+        this.rocketTexture = rocketTexture;
         this.level = level;
         velocity.x = -360 - (20 * level);
         maxHp = 2 * level;
@@ -96,16 +77,5 @@ public class Rocket implements PoolableMy {
         scale = 1.0f + (0.1f * level);
         hitArea = new Circle(position.x, position.y, 28 * scale);
         active = true;
-    }
-
-    public boolean takeDamage(int damage){
-        maxHp -= damage;
-        reddish += 0.2;
-        if (reddish >= 1.0f) reddish = 1.0f;
-        if (maxHp <= 0) {
-            deactivate();
-            return true;
-        }
-        return false;
     }
 }

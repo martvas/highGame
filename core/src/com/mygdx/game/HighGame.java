@@ -31,7 +31,7 @@ public class HighGame extends ApplicationAdapter {
         player = new Player(this, atlas, atlas.findRegion("hpBar"), 74, 328, 0, 0, 10);
         background = new Background(atlas);
         asteroidEmitter = new AsteroidEmitter(25, 0.5f, atlas.findRegion("asteroid"));
-        rocketEmitter = new RocketEmitter(3, 5.0f);
+        rocketEmitter = new RocketEmitter(3, 5.0f, atlas);
         enemyUfoEmitter = new EnemyUfoEmitter(5, 7.0f, this);
         bulletEmitter = new BulletEmitter(atlas, 200);
         font = new BitmapFont(Gdx.files.internal("font.fnt"));
@@ -54,7 +54,7 @@ public class HighGame extends ApplicationAdapter {
         batch.begin();
         background.render(batch);
         player.render(batch);
-        rocketEmitter.render(batch, atlas.findRegion("enemyRocket"));
+        rocketEmitter.render(batch);
         bulletEmitter.render(batch);
         asteroidEmitter.render(batch);
         enemyUfoEmitter.render(batch);
