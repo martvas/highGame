@@ -6,20 +6,28 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
-public class EnemyUfo extends Ship implements PoolableMy {
+public class Enemy extends Ship implements PoolableMy {
+    enum EnemyType{
+        UFO, ROCKET;
+    }
 
     private static final float SIZE = 64.0f;
     private static final float HALF_SIZE = SIZE / 2;
 
     private int level;
     private float scale;
-    AtlasRegion enemyUfoTexture;
+    private AtlasRegion enemyTexture;
 
-    float innerTimerToMove;
-    float randomEnemyMoveTime;
-    int randomMove;
+    private float innerTimerToMove;
+    private float randomEnemyMoveTime;
+    private int randomMove;
+    private EnemyType enemyType;
 
-    public EnemyUfo() {
+    public int getLevel() {
+        return level;
+    }
+
+    public Enemy() {
         position = new Vector2(0.0f, 0.0f);
         velocity = new Vector2(0.0f, 0.0f);
         hp = 0;
@@ -31,7 +39,6 @@ public class EnemyUfo extends Ship implements PoolableMy {
 
         innerTimerToMove = 0;
         randomMove = 0;
-
         isPlayer = false;
         active = false;
     }
@@ -46,7 +53,7 @@ public class EnemyUfo extends Ship implements PoolableMy {
         if (reddish > 0.01) {
             batch.setColor(1.0f, 1.0f - reddish, 1.0f - reddish, 1.0f);
         }
-        batch.draw(enemyUfoTexture, position.x - HALF_SIZE, position.y - HALF_SIZE, HALF_SIZE, HALF_SIZE, SIZE,
+        batch.draw(enemyTexture, position.x - HALF_SIZE, position.y - HALF_SIZE, HALF_SIZE, HALF_SIZE, SIZE,
                 SIZE, scale, scale, 0);
 
         if (reddish > 0.1) {
@@ -56,8 +63,10 @@ public class EnemyUfo extends Ship implements PoolableMy {
 
     public void update(float dt) {
 
-        movements(dt);
-        pressFire(dt);
+        if(enemyType == EnemyType.UFO){
+            ufoMovements(dt);
+            pressFire(dt);
+        }
 
         position.mulAdd(velocity, dt);
         hitArea.setPosition(position);
@@ -70,11 +79,19 @@ public class EnemyUfo extends Ship implements PoolableMy {
         }
         if (position.y > HighGame.SCREEN_HEIGHT - HALF_SIZE) {
             position.y = HighGame.SCREEN_HEIGHT - HALF_SIZE;
-            if (velocity.y > 0.0f) velocity.y *= -1;
+            if (velocity.y > 0.0f){
+                if (enemyType == EnemyType.UFO) velocity.y *= -1;
+                if (enemyType == EnemyType.ROCKET) velocity.y = 0.0f;
+            }
+
+                velocity.y *= -1;
         }
         if (position.y < HALF_SIZE) {
             position.y = HALF_SIZE;
-            if (velocity.y < 0.0f) velocity.y *= -1;
+            if (velocity.y < 0.0f) {
+                if (enemyType == EnemyType.UFO) velocity.y *= -1;
+                if (enemyType == EnemyType.ROCKET) velocity.y = 0.0f;
+            }
         }
     }
 
@@ -83,8 +100,17 @@ public class EnemyUfo extends Ship implements PoolableMy {
         deactivate();
     }
 
-    public void activate(float x, float y, int level, HighGame game) {
-        this.enemyUfoTexture = game.getAtlas().findRegion("ufo");
+    public void activate(EnemyType enemyType, float x, float y, int level, GameScreen game) {
+        if (enemyType == EnemyType.UFO){
+            this.enemyType = EnemyType.UFO;
+            this.enemyTexture = game.getAtlas().findRegion("ufo");
+            randomEnemyMoveTime = MathUtils.random(0.01f, 0.5f);
+            fireRate = 2f + (0.2f * level) + randomEnemyMoveTime;
+        } else if (enemyType == EnemyType.ROCKET) {
+            this.enemyType = EnemyType.ROCKET;
+            this.enemyTexture = game.getAtlas().findRegion("enemyRocket");
+            velocity.x = -360 - (20 * level);
+        }
         position.set(x, y);
         this.level = level;
         maxHp = 3 * level;
@@ -93,15 +119,13 @@ public class EnemyUfo extends Ship implements PoolableMy {
         scale = 1.0f + (0.1f * level);
         hitArea = new Circle(position.x, position.y, 28 * scale);
 
-        randomEnemyMoveTime = MathUtils.random(0.01f, 0.5f);
-        fireRate = 2f + (0.2f * level) + randomEnemyMoveTime;
         this.game = game;
         active = true;
     }
 
     //Мои враги это НЛО поэтому они так передвигаются.
     //Навстречу моему кораблю двигаются на большее растояние, но могут и отступить на расстояние покороче
-    public void movements(float dt) {
+    public void ufoMovements(float dt) {
         innerTimerToMove += dt;
         if (randomMove == 0) {
             randomMove = MathUtils.random(1, 4);
@@ -120,6 +144,7 @@ public class EnemyUfo extends Ship implements PoolableMy {
             case (3):
                 velocity.x = MathUtils.random(50.0f, 75.0f);
                 velocity.y = MathUtils.random(0.0f, 50.0f);
+                randomMove = 5;
                 break;
             case (4):
                 velocity.x = MathUtils.random(50.0f, 75.0f);
@@ -133,6 +158,4 @@ public class EnemyUfo extends Ship implements PoolableMy {
             innerTimerToMove = 0;
         }
     }
-
-
 }

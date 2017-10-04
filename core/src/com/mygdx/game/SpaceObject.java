@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 
 public abstract class SpaceObject {
-    protected HighGame game;
+    protected GameScreen game;
     protected Vector2 position;
     protected Vector2 velocity;
     protected int hp;

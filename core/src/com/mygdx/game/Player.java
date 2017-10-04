@@ -18,10 +18,11 @@ public class Player extends Ship {
     private AtlasRegion shipTexture;
     private int lives;
     private int score;
+    private Joystick joystick;
 
-    TextureRegion redHpRegion;
-    TextureRegion greenHpRegion;
-    StringBuilder hudStringHelper;
+    private TextureRegion redHpRegion;
+    private TextureRegion greenHpRegion;
+    private StringBuilder hudStringHelper;
 
     public static float getHalfSize() {
         return HALF_SIZE;
@@ -39,7 +40,7 @@ public class Player extends Ship {
         return velocity;
     }
 
-    public Player(HighGame game, TextureAtlas atlas, AtlasRegion textureHP, float x, float y, float vx, float vy, float enginePower){
+    public Player(GameScreen game, TextureAtlas atlas, AtlasRegion textureHP, float x, float y, float vx, float vy, float enginePower){
         this.shipTexture = atlas.findRegion("ship");
         this.position = new Vector2(x, y);
         this.velocity = new Vector2(vx, vy);
@@ -58,6 +59,8 @@ public class Player extends Ship {
 
         this.weaponDirection = new Vector2(1.0f, 0.0f);
         isPlayer = true;
+
+        this.joystick = new Joystick(atlas.findRegion("joystick"));
     }
 
     public void addScore(int scoreToAdd){
@@ -73,6 +76,7 @@ public class Player extends Ship {
         if (reddish > 0.01){
             batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
         }
+        joystick.render(batch);
     }
 
     public void renderHUD(SpriteBatch batch, float x, float y, BitmapFont font) {
@@ -97,6 +101,11 @@ public class Player extends Ship {
 
     @Override
     public void update(float dt){
+        joystick.update();
+        if(joystick.getPower() > 0.02f) {
+            velocity.x += enginePower * dt * joystick.getNormal().x * joystick.getPower();
+            velocity.y += enginePower * dt * joystick.getNormal().y * joystick.getPower();
+        }
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)){
             velocity.y += enginePower;

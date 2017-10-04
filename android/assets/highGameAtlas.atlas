@@ -5,35 +5,49 @@ filter: Nearest,Nearest
 repeat: none
 asteroid
   rotate: false
-  xy: 1, 19
+  xy: 1, 353
   size: 630, 479
   orig: 630, 479
   offset: 0, 0
   index: -1
+fireButton
+  rotate: false
+  xy: 1, 117
+  size: 234, 234
+  orig: 234, 234
+  offset: 0, 0
+  index: -1
+joystick
+  rotate: false
+  xy: 633, 580
+  size: 202, 252
+  orig: 202, 252
+  offset: 0, 0
+  index: -1
 hpBar
   rotate: false
-  xy: 633, 402
+  xy: 1, 19
   size: 224, 96
   orig: 224, 96
   offset: 0, 0
   index: -1
 enemyRocket
   rotate: false
-  xy: 633, 336
+  xy: 237, 287
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 ship
   rotate: false
-  xy: 859, 434
+  xy: 633, 514
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 ufo
   rotate: false
-  xy: 633, 270
+  xy: 837, 768
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
@@ -47,14 +61,14 @@ bullet
   index: -1
 bulletOther
   rotate: false
-  xy: 699, 384
+  xy: 237, 269
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 star16
   rotate: false
-  xy: 859, 416
+  xy: 303, 335
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
