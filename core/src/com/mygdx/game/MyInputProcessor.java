@@ -1,12 +1,14 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class MyInputProcessor implements InputProcessor {
+
 
     class TouchInfo {
         int x;
@@ -48,8 +50,9 @@ public class MyInputProcessor implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        temp.set(screenX, screenY);
+        temp.set(screenX, 0);
         map.get(pointer).x = (int) highGame.getViewport().unproject(temp).x;
+        temp.set(0, screenY);
         map.get(pointer).y = (int) highGame.getViewport().unproject(temp).y;
         map.get(pointer).touched = true;
         return false;
@@ -75,6 +78,10 @@ public class MyInputProcessor implements InputProcessor {
         return map.get(pointer).y;
     }
 
+    public int isTouchedInArea(Rectangle rectangle){
+        return isTouchedInArea((int)rectangle.x, (int)rectangle.y, (int)rectangle.width, (int)rectangle.height);
+    }
+
     //Проверяет нажат ли тач в определенной области
     public int isTouchedInArea(int x, int y, int w, int h){
         for (Map.Entry<Integer, TouchInfo> o : map.entrySet()){
@@ -84,11 +91,15 @@ public class MyInputProcessor implements InputProcessor {
                 if (t.x > x && t.x < x + w && t.y > y && t.y < y + h){
                     return id;
                 }
-
             }
         }
         return -1;
     }
+
+    public boolean isTouchedInAreaBoolean (Rectangle rectangle){
+        return isTouchedInArea((int)rectangle.x, (int)rectangle.y, (int)rectangle.width, (int)rectangle.height) > -1;
+    }
+
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {

@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -23,6 +24,13 @@ public class Player extends Ship {
     private TextureRegion redHpRegion;
     private TextureRegion greenHpRegion;
     private StringBuilder hudStringHelper;
+    private Sound blasterSound;
+    private Sound bulletSound;
+    private Sound rocketSound;
+
+    private HighGame highGame;
+
+    private WeaponType weaponType;
 
     public static float getHalfSize() {
         return HALF_SIZE;
@@ -40,7 +48,11 @@ public class Player extends Ship {
         return velocity;
     }
 
-    public Player(GameScreen game, TextureAtlas atlas, AtlasRegion textureHP, float x, float y, float vx, float vy, float enginePower){
+    public int getLives() {
+        return lives;
+    }
+
+    public Player(GameScreen game, TextureAtlas atlas, AtlasRegion textureHP, float x, float y, float vx, float vy, float enginePower, Sound blasterSound, Sound bulletSound, Sound rocketSound, HighGame highGame){
         this.shipTexture = atlas.findRegion("ship");
         this.position = new Vector2(x, y);
         this.velocity = new Vector2(vx, vy);
@@ -56,15 +68,22 @@ public class Player extends Ship {
         this.lives = 3;
         this.score = 0;
         this.hudStringHelper = new StringBuilder(50);
-
         this.weaponDirection = new Vector2(1.0f, 0.0f);
-        isPlayer = true;
-
-        this.joystick = new Joystick(atlas.findRegion("joystick"));
+        this.isPlayer = true;
+        this.joystick = new Joystick(atlas, this);
+        this.blasterSound = blasterSound;
+        this.bulletSound = bulletSound;
+        this.rocketSound = rocketSound;
+        this.highGame = highGame;
+        this.weaponType = WeaponType.BULLET;
     }
 
     public void addScore(int scoreToAdd){
         score += scoreToAdd;
+    }
+
+    public WeaponType getWeaponType() {
+        return weaponType;
     }
 
     @Override
@@ -77,6 +96,10 @@ public class Player extends Ship {
             batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
         }
         joystick.render(batch);
+    }
+
+    public void fullRepair() {
+        this.hp = this.maxHp;
     }
 
     public void renderHUD(SpriteBatch batch, float x, float y, BitmapFont font) {
@@ -101,46 +124,9 @@ public class Player extends Ship {
 
     @Override
     public void update(float dt){
-        joystick.update();
-        if(joystick.getPower() > 0.02f) {
-            velocity.x += enginePower * dt * joystick.getNormal().x * joystick.getPower();
-            velocity.y += enginePower * dt * joystick.getNormal().y * joystick.getPower();
-        }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.W)){
-            velocity.y += enginePower;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.S)){
-            velocity.y -= enginePower;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.A)){
-            velocity.x -= enginePower;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.D)){
-            velocity.x += enginePower;
-        }
-        velocity.scl(0.97f);
-
-        if(Gdx.input.isKeyPressed(Input.Keys.L)){
-            pressFire(dt);
-        }
-
-        if (position.x > HighGame.SCREEN_WIDTH - HALF_SIZE){
-            position.x = HighGame.SCREEN_WIDTH - HALF_SIZE;
-            if (velocity.x > 0.0f) velocity.x = 0.0f;
-        }
-        if (position.x < HALF_SIZE){
-            position.x = HALF_SIZE;
-            if (velocity.x < 0.0f) velocity.x = 0.0f;
-        }
-        if (position.y > HighGame.SCREEN_HEIGHT - HALF_SIZE){
-            position.y = HighGame.SCREEN_HEIGHT - HALF_SIZE;
-            if (velocity.y > 0.0f ) velocity.y = 0.0f;
-        }
-        if (position.y < HALF_SIZE){
-            position.y = HALF_SIZE;
-            if (velocity.y < 0.0f) velocity.y = 0.0f;
-        }
+        сontrol(dt);
+        checkPosition();
 
         reddish -= dt * 4;
         if (reddish <= 0.0f) reddish = 0.0f;
@@ -168,4 +154,78 @@ public class Player extends Ship {
         return maxHp <= 0;
     }
 
+    @Override
+    public void fire(WeaponType weaponType){
+        super.fire(weaponType);
+        switch (weaponType){
+            case BULLET:
+                bulletSound.play(0.2f);
+                break;
+            case ROCKET:
+                rocketSound.play(0.2f);
+                break;
+            case BLASTER:
+                blasterSound.play(0.2f);
+                break;
+        }
+    }
+
+    public void changeWeapon (WeaponType weaponType){
+        this.weaponType = weaponType;
+    }
+
+    public void dispose(){
+        bulletSound.dispose();
+        rocketSound.dispose();
+        blasterSound.dispose();
+    }
+
+    public void сontrol(float dt){
+
+        joystick.update(dt);
+
+        if(joystick.getPower() > 0.02f) {
+            velocity.x += enginePower * dt * joystick.getNormal().x * joystick.getPower();
+            velocity.y += enginePower * dt * joystick.getNormal().y * joystick.getPower();
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.W)){
+            velocity.y += enginePower;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.S)){
+            velocity.y -= enginePower;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.A)){
+            velocity.x -= enginePower;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.D)){
+            velocity.x += enginePower;
+        }
+        velocity.scl(0.97f);
+
+        if(Gdx.input.isKeyPressed(Input.Keys.L)){
+            pressFire(dt, weaponType);
+        }
+
+    }
+
+    public void checkPosition(){
+
+        if (position.x > HighGame.SCREEN_WIDTH - HALF_SIZE){
+            position.x = HighGame.SCREEN_WIDTH - HALF_SIZE;
+            if (velocity.x > 0.0f) velocity.x = 0.0f;
+        }
+        if (position.x < HALF_SIZE){
+            position.x = HALF_SIZE;
+            if (velocity.x < 0.0f) velocity.x = 0.0f;
+        }
+        if (position.y > HighGame.SCREEN_HEIGHT - HALF_SIZE){
+            position.y = HighGame.SCREEN_HEIGHT - HALF_SIZE;
+            if (velocity.y > 0.0f ) velocity.y = 0.0f;
+        }
+        if (position.y < HALF_SIZE){
+            position.y = HALF_SIZE;
+            if (velocity.y < 0.0f) velocity.y = 0.0f;
+        }
+    }
 }

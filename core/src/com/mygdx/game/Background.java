@@ -40,11 +40,11 @@ public class Background {
     private Texture texture;
     private TextureRegion textureStar;
     private Star[] stars;
-
     private AtlasRegion starTexture;
 
-    public Background(TextureAtlas atlas) {
-        texture = new Texture("bg2.png");
+
+    public Background(TextureAtlas atlas, Texture bgTexture) {
+        texture = bgTexture;
         this.textureStar = textureStar;
         stars = new Star[250];
         starTexture = atlas.findRegion("star16");
@@ -68,5 +68,9 @@ public class Background {
         for (Star o : stars) {
             o.update(dt, v);
         }
+    }
+
+    public void dispose(){
+        texture.dispose();
     }
 }

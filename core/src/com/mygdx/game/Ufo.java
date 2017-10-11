@@ -6,10 +6,7 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
-public class Enemy extends Ship implements PoolableMy {
-    enum EnemyType{
-        UFO, ROCKET;
-    }
+public class Ufo extends Ship implements PoolableMy {
 
     private static final float SIZE = 64.0f;
     private static final float HALF_SIZE = SIZE / 2;
@@ -21,13 +18,13 @@ public class Enemy extends Ship implements PoolableMy {
     private float innerTimerToMove;
     private float randomEnemyMoveTime;
     private int randomMove;
-    private EnemyType enemyType;
+    private WeaponType weaponType;
 
     public int getLevel() {
         return level;
     }
 
-    public Enemy() {
+    public Ufo() {
         position = new Vector2(0.0f, 0.0f);
         velocity = new Vector2(0.0f, 0.0f);
         hp = 0;
@@ -40,6 +37,7 @@ public class Enemy extends Ship implements PoolableMy {
         innerTimerToMove = 0;
         randomMove = 0;
         isPlayer = false;
+
         active = false;
     }
 
@@ -53,6 +51,7 @@ public class Enemy extends Ship implements PoolableMy {
         if (reddish > 0.01) {
             batch.setColor(1.0f, 1.0f - reddish, 1.0f - reddish, 1.0f);
         }
+
         batch.draw(enemyTexture, position.x - HALF_SIZE, position.y - HALF_SIZE, HALF_SIZE, HALF_SIZE, SIZE,
                 SIZE, scale, scale, 0);
 
@@ -62,11 +61,8 @@ public class Enemy extends Ship implements PoolableMy {
     }
 
     public void update(float dt) {
-
-        if(enemyType == EnemyType.UFO){
-            ufoMovements(dt);
-            pressFire(dt);
-        }
+        ufoMovements(dt);
+        pressFire(dt, weaponType);
 
         position.mulAdd(velocity, dt);
         hitArea.setPosition(position);
@@ -79,18 +75,16 @@ public class Enemy extends Ship implements PoolableMy {
         }
         if (position.y > HighGame.SCREEN_HEIGHT - HALF_SIZE) {
             position.y = HighGame.SCREEN_HEIGHT - HALF_SIZE;
-            if (velocity.y > 0.0f){
-                if (enemyType == EnemyType.UFO) velocity.y *= -1;
-                if (enemyType == EnemyType.ROCKET) velocity.y = 0.0f;
+            if (velocity.y > 0.0f) {
+                velocity.y *= -1;
             }
 
-                velocity.y *= -1;
+            velocity.y *= -1;
         }
         if (position.y < HALF_SIZE) {
             position.y = HALF_SIZE;
             if (velocity.y < 0.0f) {
-                if (enemyType == EnemyType.UFO) velocity.y *= -1;
-                if (enemyType == EnemyType.ROCKET) velocity.y = 0.0f;
+                velocity.y *= -1;
             }
         }
     }
@@ -100,17 +94,10 @@ public class Enemy extends Ship implements PoolableMy {
         deactivate();
     }
 
-    public void activate(EnemyType enemyType, float x, float y, int level, GameScreen game) {
-        if (enemyType == EnemyType.UFO){
-            this.enemyType = EnemyType.UFO;
-            this.enemyTexture = game.getAtlas().findRegion("ufo");
-            randomEnemyMoveTime = MathUtils.random(0.01f, 0.5f);
-            fireRate = 2f + (0.2f * level) + randomEnemyMoveTime;
-        } else if (enemyType == EnemyType.ROCKET) {
-            this.enemyType = EnemyType.ROCKET;
-            this.enemyTexture = game.getAtlas().findRegion("enemyRocket");
-            velocity.x = -360 - (20 * level);
-        }
+    public void activate(float x, float y, int level, GameScreen game) {
+        this.enemyTexture = game.getAtlas().findRegion("ufo");
+        randomEnemyMoveTime = MathUtils.random(0.01f, 0.5f);
+        fireRate = 2f + (0.2f * level) + randomEnemyMoveTime;
         position.set(x, y);
         this.level = level;
         maxHp = 3 * level;
@@ -118,6 +105,11 @@ public class Enemy extends Ship implements PoolableMy {
         reddish = 0.0f;
         scale = 1.0f + (0.1f * level);
         hitArea = new Circle(position.x, position.y, 28 * scale);
+        if (level == 1 ){
+            weaponType = WeaponType.BULLET;
+        } else if (level == 2){
+            weaponType = WeaponType.ROCKET;
+        } else weaponType = WeaponType.BLASTER;
 
         this.game = game;
         active = true;

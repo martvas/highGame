@@ -11,6 +11,7 @@ public class AsteroidEmitter extends ObjectPool<Asteroid> {
     private float generationTime;
     private float innerTimer;
     private AtlasRegion asteroidTexture;
+    private boolean asteroidActivation;
 
     public AsteroidEmitter(int size, float generationTime, AtlasRegion asteroidTexture) {
         super(size);
@@ -20,12 +21,16 @@ public class AsteroidEmitter extends ObjectPool<Asteroid> {
         }
         this.generationTime = generationTime;
         this.innerTimer = 0.0f;
+        this.asteroidActivation = true;
     }
 
     @Override
     protected Asteroid newObject() {
         return new Asteroid(asteroidTexture);
+    }
 
+    public void setAsteroidActivation(boolean asteroidActivation) {
+        this.asteroidActivation = asteroidActivation;
     }
 
     public void render(SpriteBatch batch) {
@@ -36,10 +41,12 @@ public class AsteroidEmitter extends ObjectPool<Asteroid> {
     }
 
     public void update(float dt) {
-        innerTimer += dt;
-        if (innerTimer > generationTime){
-            setup();
-            innerTimer -= generationTime;
+        if (asteroidActivation){
+            innerTimer += dt;
+            if (innerTimer > generationTime){
+                setup();
+                innerTimer -= generationTime;
+            }
         }
         for (int i = 0; i < activeList.size(); i++) {
             activeList.get(i).update(dt);

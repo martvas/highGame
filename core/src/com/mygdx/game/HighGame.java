@@ -1,15 +1,10 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -20,6 +15,16 @@ public class HighGame extends Game {
 
     private SpriteBatch batch;
     private GameScreen gameScreen;
+    private MenuScreen menuScreen;
+    private Assets assets;
+
+    public Assets getAssets() {
+        return assets;
+    }
+
+    public MenuScreen getMenuScreen() {
+        return menuScreen;
+    }
 
     private Viewport viewport;
     private Camera camera;
@@ -27,13 +32,15 @@ public class HighGame extends Game {
     @Override
     public void create() {
         batch = new SpriteBatch();
-
         camera = new OrthographicCamera(SCREEN_WIDTH, SCREEN_HEIGHT);
         viewport = new FitViewport(SCREEN_WIDTH, SCREEN_HEIGHT, camera);
         MyInputProcessor mip = new MyInputProcessor(this);
         Gdx.input.setInputProcessor(mip);
         gameScreen = new GameScreen(this, batch);
-        setScreen(gameScreen);
+        menuScreen = new MenuScreen(batch, this, gameScreen);
+        assets = new Assets();
+        assets.loadAssets(Assets.ScreenType.MENU);
+        setScreen(menuScreen);
     }
 
     public Viewport getViewport(){

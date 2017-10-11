@@ -1,0 +1,49 @@
+package com.mygdx.game;
+
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+
+public class PowerUpsEmitter {
+    private PowerUp[] powerUps;
+    private TextureRegion[][] textureRegion;
+
+    public PowerUp[] getPowerUps() {
+        return powerUps;
+    }
+
+    public PowerUpsEmitter(TextureRegion textureRegion) {
+        this.textureRegion = textureRegion.split(64, 64);
+        this.powerUps = new PowerUp[50];
+        for (int i = 0; i < powerUps.length; i++) {
+            powerUps[i] = new PowerUp();
+        }
+    }
+
+    public void render(SpriteBatch batch) {
+        for (int i = 0; i < powerUps.length; i++) {
+            if (powerUps[i].isActive()) {
+                batch.draw(textureRegion[0][powerUps[i].getType().getNumber()], powerUps[i].getPosition().x - 16, powerUps[i].getPosition().y - 16, 32, 32);
+            }
+        }
+    }
+
+    public void update(float dt) {
+        for (int i = 0; i < powerUps.length; i++) {
+            if (powerUps[i].isActive()) {
+                powerUps[i].update(dt);
+            }
+        }
+    }
+
+    public void makePower(float x, float y) {
+        if (Math.random() < 0.8) {
+            for (int i = 0; i < powerUps.length; i++) {
+                if (!powerUps[i].isActive()) {
+                    PowerUp.Type t = PowerUp.Type.values()[(int) (Math.random() * 4)];
+                    powerUps[i].activate(x, y, t);
+                    break;
+                }
+            }
+        }
+    }
+}

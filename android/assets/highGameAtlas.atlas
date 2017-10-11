@@ -5,70 +5,133 @@ filter: Nearest,Nearest
 repeat: none
 asteroid
   rotate: false
-  xy: 1, 353
+  xy: 1, 537
   size: 630, 479
   orig: 630, 479
   offset: 0, 0
   index: -1
+explosion_my
+  rotate: false
+  xy: 1, 279
+  size: 512, 256
+  orig: 512, 256
+  offset: 0, 0
+  index: -1
 fireButton
   rotate: false
-  xy: 1, 117
-  size: 234, 234
-  orig: 234, 234
+  xy: 633, 760
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1
+play
+  rotate: false
+  xy: 1, 19
+  size: 234, 258
+  orig: 234, 258
+  offset: 0, 0
+  index: -1
+close
+  rotate: false
+  xy: 237, 42
+  size: 236, 235
+  orig: 236, 235
   offset: 0, 0
   index: -1
 joystick
   rotate: false
-  xy: 633, 580
+  xy: 633, 506
   size: 202, 252
   orig: 202, 252
   offset: 0, 0
   index: -1
+powerup
+  rotate: false
+  xy: 515, 440
+  size: 320, 64
+  orig: 320, 64
+  offset: 0, 0
+  index: -1
+redshipr
+  rotate: false
+  xy: 515, 310
+  size: 256, 128
+  orig: 256, 128
+  offset: 0, 0
+  index: -1
 hpBar
   rotate: false
-  xy: 1, 19
+  xy: 515, 212
   size: 224, 96
   orig: 224, 96
   offset: 0, 0
   index: -1
 enemyRocket
   rotate: false
-  xy: 237, 287
+  xy: 891, 952
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 ship
   rotate: false
-  xy: 633, 514
+  xy: 891, 886
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 ufo
   rotate: false
-  xy: 837, 768
+  xy: 957, 952
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
+blasterG
+  rotate: false
+  xy: 837, 726
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+blasterR
+  rotate: false
+  xy: 773, 406
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
 bullet
   rotate: false
-  xy: 1, 1
-  size: 16, 16
-  orig: 16, 16
+  xy: 475, 245
+  size: 32, 32
+  orig: 32, 32
   offset: 0, 0
   index: -1
 bulletOther
   rotate: false
-  xy: 237, 269
-  size: 16, 16
-  orig: 16, 16
+  xy: 891, 852
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+rocketW
+  rotate: false
+  xy: 957, 918
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+rocketWother
+  rotate: false
+  xy: 991, 918
+  size: 32, 32
+  orig: 32, 32
   offset: 0, 0
   index: -1
 star16
   rotate: false
-  xy: 303, 335
+  xy: 1, 1
   size: 16, 16
   orig: 16, 16
   offset: 0, 0

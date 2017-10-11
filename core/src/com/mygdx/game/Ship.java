@@ -12,17 +12,15 @@ public abstract class Ship extends SpaceObject {
     protected Vector2 weaponDirection;
     protected boolean isPlayer;
 
-    protected TextureAtlas.AtlasRegion bulletTexture;
-
-    public void pressFire(float dt) {
+    public void pressFire(float dt, WeaponType weaponType) {
         currentFire += dt;
-        if (currentFire > fireRate) {
-            currentFire -= fireRate;
-            fire();
+        if (currentFire > fireRate + weaponType.getFireRate()) {
+            currentFire -= fireRate + weaponType.getFireRate();
+            fire(weaponType);
         }
     }
 
-    public void fire() {
-        game.getBulletEmitter().setup(isPlayer,position.x + 24.0f, position.y + 0.0f, weaponDirection.x * 640, weaponDirection.y * 640);
+    public void fire(WeaponType weaponType) {
+        game.getBulletEmitter().setup(isPlayer, weaponType,position.x + 24.0f, position.y + 0.0f);
     }
 }
