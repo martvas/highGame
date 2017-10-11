@@ -43,7 +43,6 @@ public abstract class SpaceObject {
         reddish += 0.2f;
         if (hp <= 0) {
             onDestroy();
-            deactivate();
         }
         if (reddish > 1.0f) reddish = 1.0f;
         return hp <= 0;

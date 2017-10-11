@@ -3,18 +3,13 @@ package com.mygdx.game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class BossEmitter {
     private Boss boss;
     private float innerTimer;
-    private boolean activationChecker;
 
     public BossEmitter(AtlasRegion bossTexture, AtlasRegion textureHP, GameScreen game, AsteroidEmitter asteroidEmitter, UfoEmitter ufoEmitter, RocketEmitter rocketEmitter){
         this.boss = new Boss(bossTexture, game, textureHP, asteroidEmitter, ufoEmitter, rocketEmitter);
-        activationChecker = true;
     }
 
     public Boss getBoss() {
@@ -22,14 +17,15 @@ public class BossEmitter {
     }
 
     public void update(float dt) {
-        innerTimer += dt;
-        if (innerTimer > 1.0f && activationChecker){
+        if (!boss.isActive()){
+            innerTimer += dt;
+        }
+        if (innerTimer > 30.0f){
             setup();
-            activationChecker = false;
+            innerTimer = 0.0f;
         }
         if (boss.isActive()){
             boss.update(dt);
-
         }
     }
 

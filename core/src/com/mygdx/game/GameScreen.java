@@ -152,7 +152,7 @@ public class GameScreen implements Screen {
                     }
                 }
                 Boss boss = bossEmitter.getBoss();
-                if (boss.getRectHitArea().contains(b.getPosition())){
+                if (boss.isActive() && boss.getRectHitArea().contains(b.getPosition())){
                     b.deactivate();
                     if (boss.takeDamage(b.getWeaponType().getDamage())){
                         boomEmitter.setup(boss.getPosition());

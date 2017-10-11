@@ -72,7 +72,7 @@ public class Boss extends Ship {
     }
 
     public void activate() {
-        position.set(1200, 360);
+        position.set(1600, 360);
         randomEnemyMoveTime = MathUtils.random(0.01f, 0.5f);
         rectHitArea.set(position.x, position.y, WIDTH, HEIGHT);
         fireRate = 0.5f;
